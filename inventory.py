@@ -20,10 +20,11 @@ def create_inventory():
     num_items = int(input("Enter the number of items to be stocked: "))
 
     for i in range(num_items):
-        name = input(f"Enter the name of item {i+1}: ")
-        quantity = int(input(f"Enter the initial quantity of {name}: "))
-        purchase_quantity = int(input(f"Enter the purchase quantity of {name}: "))
-        consumption_quantity = int(input(f"Enter the consumption quantity of {name}: "))
+        print(f"\nEnter details for item {i + 1}:")
+        name = input("Enter the name of the item: ")
+        quantity = int(input("Enter the initial quantity: "))
+        purchase_quantity = int(input("Enter the purchase quantity: "))
+        consumption_quantity = int(input("Enter the consumption quantity: "))
 
         item = InventoryItem(name, quantity, purchase_quantity, consumption_quantity)
         item.update_balance()
@@ -37,6 +38,7 @@ def display_inventory(inventory):
         print(item)
 
 def main():
+    print("Welcome to the Inventory Management System!")
     inventory = create_inventory()
     display_inventory(inventory)
 
