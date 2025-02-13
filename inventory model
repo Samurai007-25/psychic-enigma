@@ -39,6 +39,7 @@ class RetailStore:
 
         self.time += 1
 
+
     def place_order(self, quantity):
         self.orders_placed += 1
         self.total_ordering_cost += self.ordering_cost
