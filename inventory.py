@@ -1,46 +1,49 @@
-class InventoryItem:
-    def __init__(self, name, quantity, purchase_quantity, consumption_quantity):
-        self.name = name
-        self.quantity = quantity
-        self.purchase_quantity = purchase_quantity
-        self.consumption_quantity = consumption_quantity
-        self.balance_quantity = quantity
+import streamlit as st
 
-    def update_balance(self):
-        self.balance_quantity = self.quantity + self.purchase_quantity - self.consumption_quantity
+# Title of the app
+st.title("Inventory Management System")
 
-    def __str__(self):
-        return (f"Item: {self.name}, Quantity: {self.quantity}, "
-                f"Purchase Quantity: {self.purchase_quantity}, "
-                f"Consumption Quantity: {self.consumption_quantity}, "
-                f"Balance Quantity: {self.balance_quantity}")
+# Initialize session state to store inventory
+if "inventory" not in st.session_state:
+    st.session_state.inventory = []
 
-def create_inventory():
-    inventory = []
-    num_items = int(input("Enter the number of items to be stocked: "))
+# Function to add an item to the inventory
+def add_item(name, quantity, purchase_quantity, consumption_quantity):
+    balance_quantity = quantity + purchase_quantity - consumption_quantity
+    item = {
+        "name": name,
+        "quantity": quantity,
+        "purchase_quantity": purchase_quantity,
+        "consumption_quantity": consumption_quantity,
+        "balance_quantity": balance_quantity,
+    }
+    st.session_state.inventory.append(item)
 
-    for i in range(num_items):
-        print(f"\nEnter details for item {i + 1}:")
-        name = input("Enter the name of the item: ")
-        quantity = int(input("Enter the initial quantity: "))
-        purchase_quantity = int(input("Enter the purchase quantity: "))
-        consumption_quantity = int(input("Enter the consumption quantity: "))
+# Sidebar for adding new items
+with st.sidebar:
+    st.header("Add New Item")
+    name = st.text_input("Item Name")
+    quantity = st.number_input("Initial Quantity", min_value=0, step=1)
+    purchase_quantity = st.number_input("Purchase Quantity", min_value=0, step=1)
+    consumption_quantity = st.number_input("Consumption Quantity", min_value=0, step=1)
+    if st.button("Add Item"):
+        if name:  # Check if the name is not empty
+            add_item(name, quantity, purchase_quantity, consumption_quantity)
+            st.success(f"Item '{name}' added to inventory!")
+        else:
+            st.error("Please enter a valid item name.")
 
-        item = InventoryItem(name, quantity, purchase_quantity, consumption_quantity)
-        item.update_balance()
-        inventory.append(item)
-
-    return inventory
-
-def display_inventory(inventory):
-    print("\nCurrent Inventory:")
-    for item in inventory:
-        print(item)
-
-def main():
-    print("Welcome to the Inventory Management System!")
-    inventory = create_inventory()
-    display_inventory(inventory)
-
-if __name__ == "__main__":
-    main()
+# Display the current inventory
+st.header("Current Inventory")
+if st.session_state.inventory:
+    for item in st.session_state.inventory:
+        st.write(f"""
+        **Item:** {item['name']}  
+        **Initial Quantity:** {item['quantity']}  
+        **Purchase Quantity:** {item['purchase_quantity']}  
+        **Consumption Quantity:** {item['consumption_quantity']}  
+        **Balance Quantity:** {item['balance_quantity']}  
+        """)
+        st.write("---")
+else:
+    st.info("No items in the inventory yet. Add items using the sidebar.")
