@@ -32,20 +32,9 @@ def add_item(name, quantity, purchase_quantity, consumption_quantity, shelf_life
     }
     st.session_state.inventory.append(item)
 
-# Function to calculate inventory status for a specific date
-def calculate_inventory_status(selected_date):
-    updated_inventory = []
-    for item in st.session_state.inventory:
-        expiry_date = datetime.strptime(item["Expiry Date"], "%Y-%m-%d")
-        status = "Usable" if expiry_date > selected_date else "Expired"
-        updated_item = item.copy()
-        updated_item["Status"] = status
-        updated_inventory.append(updated_item)
-    return updated_inventory
-
 # Function to calculate wastage and loss
-def calculate_wastage(inventory):
-    wastage_items = [item for item in inventory if item["Status"] == "Expired"]
+def calculate_wastage():
+    wastage_items = [item for item in st.session_state.inventory if item["Status"] == "Expired"]
     total_wastage_quantity = sum(item["Balance Quantity"] for item in wastage_items)
     total_loss = sum(item["Total Cost"] for item in wastage_items)
     return wastage_items, total_wastage_quantity, total_loss
@@ -71,22 +60,15 @@ with st.sidebar:
             else:
                 st.error("Please enter a valid item name.")
 
-# Date selection for inventory status
-st.header("Inventory Status")
-selected_date = st.date_input("Select a date to view inventory status", min_value=datetime.now())
-
-# Calculate inventory status for the selected date
-updated_inventory = calculate_inventory_status(selected_date)
-
-# Display the inventory as of the selected date
-st.subheader(f"Inventory as on {selected_date.strftime('%d/%m/%Y')}")
-if updated_inventory:
+# Display the current inventory in a table
+st.header("Current Inventory")
+if st.session_state.inventory:
     # Convert inventory to a DataFrame for tabular display
-    inventory_df = pd.DataFrame(updated_inventory)
+    inventory_df = pd.DataFrame(st.session_state.inventory)
     st.table(inventory_df)
 
     # Calculate wastage and loss
-    wastage_items, total_wastage_quantity, total_loss = calculate_wastage(updated_inventory)
+    wastage_items, total_wastage_quantity, total_loss = calculate_wastage()
     if wastage_items:
         st.subheader("Wastage Details")
         wastage_df = pd.DataFrame(wastage_items)
